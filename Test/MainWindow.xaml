@@ -4,9 +4,70 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Test"
+        xmlns:vm="clr-namespace:Test.ViewModels"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+        xmlns:m="clr-namespace:Test.Models"
+        Title="MainWindow" Height="400" Width="800" Background="#505050">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Views\Styles\Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Window.DataContext>
+        <vm:MainVM/>
+    </Window.DataContext>
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition />
+        </Grid.RowDefinitions>
         
+        <Grid>
+            <ComboBox Width="50" HorizontalAlignment="Left"
+                      ItemsSource="{Binding Path=LogicalDrivers, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                      SelectedItem="{Binding Path=SelectedDriver, Mode=OneWayToSource}"/>
+        </Grid>
+        
+        
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <TreeView Background="Transparent" Name="myTreeView" 
+                      
+                      FontSize="14" ItemContainerStyle="{DynamicResource TreeViewItemStyle}" >
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseDoubleClick">
+                        <i:InvokeCommandAction Command="{Binding Path=SelectedItemChanged}"
+                                   CommandParameter="{Binding ElementName=myTreeView, Path=SelectedItem}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <TreeView.Resources>
+                    <Style TargetType="TreeViewItem">
+                        <Setter Property="Foreground" Value="White"/>
+                    </Style>
+                </TreeView.Resources>
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate ItemsSource="{Binding Path=Nodes, UpdateSourceTrigger=PropertyChanged}">
+                        <TextBlock Text="{Binding Path=Path}" />
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+            
+
+            <Grid>
+                
+            </Grid>
+
+            
+            <Grid Grid.Column="1">
+                <Image Width="32" Height="32" Source="{Binding Path=Image, UpdateSourceTrigger=PropertyChanged}"/>
+            </Grid>
+        </Grid>
     </Grid>
 </Window>
