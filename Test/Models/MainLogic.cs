@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Drawing;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Windows.Controls;
-using System.Windows.Media;
 
 namespace Test.Models
 {
@@ -14,9 +12,59 @@ namespace Test.Models
         public MainLogic()
         {
             LogicalDrivers = Environment.GetLogicalDrives().ToList();
+        }     
+    
+        string selectedDriver;
+        public string SelectedDriver
+        {
+            get => selectedDriver;
+            set
+            {
+                selectedDriver = value;
+                if (value == null)
+                    return;
+
+                FoldersAndFiles.Clear();
+
+                List<string> foldersAndFiles = Service.GetFoldersAndFilesFromPath(value);
+                foldersAndFiles = Service.GetNamesFromPaths(foldersAndFiles);
+                foreach(string @object in foldersAndFiles)
+                {
+                    ObjectToView item = new ObjectToView()
+                    {
+                        Name = @object,
+                        Path = value + @object,
+                        Image = Service.GetImageByPath(value + @object)
+                    };
+                    AddContextAction(item);
+                    FoldersAndFiles.Add(item);
+                }
+            }
         }
 
-        private static string CurrentPath { get; set; }  // текущий каталог
+        BaseModel contentModel;
+        public BaseModel ContentModel
+        {
+            get => contentModel;
+            set
+            {
+                contentModel = value;
+                OnPropertyChanged();
+            }
+        }
+
+        #region Collections
+
+        ObservableCollection<ObjectToView> foldersAndFiles = new ObservableCollection<ObjectToView>();
+        public ObservableCollection<ObjectToView> FoldersAndFiles
+        {
+            get => foldersAndFiles;
+            set
+            {
+                foldersAndFiles = value;
+                OnPropertyChanged();
+            }
+        }
 
         List<string> logicalDrivers = new List<string>();
         public List<string> LogicalDrivers
@@ -29,112 +77,112 @@ namespace Test.Models
             }
         }
 
-        string selectedDriver;
-        public string SelectedDriver
-        {
-            get => selectedDriver;
-            set
-            {
-                selectedDriver = value;
-                if (value == null)
-                    return;
-
-                CurrentPath = value;
-                TreeItems.Clear();
-
-                List<string> folders = Service.GetFolders(value);
-                folders = Service.GetNamesFromPaths(folders);
-                foreach(string folder in folders)
-                {
-                    TreeViewItem item = new TreeViewItem()
-                    {
-                        Header = folder,
-                        Tag = value + folder
-                    };
-                    TreeItems.Add(item);
-                }
-
-                List<string> files = Service.GetFiles(value);
-                files = Service.GetNamesFromPaths(files);
-                foreach (string file in files)
-                {
-                    TreeViewItem item = new TreeViewItem()
-                    {
-                        Header = file,
-                        Tag = value + file
-                    };
-                    TreeItems.Add(item);
-                }
-            }
-        }
-
-
-        ObservableCollection<TreeViewItem> treeItems = new ObservableCollection<TreeViewItem>();
-        public ObservableCollection<TreeViewItem> TreeItems
-        {
-            get => treeItems;
-            set
-            {
-                treeItems = value;
-                OnPropertyChanged();
-            }
-        }
-
-
-        ObservableCollection<ObjectToView> objects = new ObservableCollection<ObjectToView>();
-        public ObservableCollection<ObjectToView> Objects
-        {
-            get => objects;
-            set
-            {
-                objects = value;
-                OnPropertyChanged();
-            }
-        }
-
+        #endregion
 
         #region Commands
-        RelayCommand selectedItemChanged;
-        public RelayCommand SelectedItemChanged => selectedItemChanged ??
-                 (selectedItemChanged = new RelayCommand(obj =>
+        RelayCommand itemDoubleClick;
+        public RelayCommand ItemDoubleClick => itemDoubleClick ??
+                 (itemDoubleClick = new RelayCommand(obj =>
                  {
-                     TreeViewItem parent = obj as TreeViewItem;
-                     string path = parent.Tag.ToString();
-                     bool isDirectory = Service.IsDirectory(path);
+                     ObjectToView parent = obj as ObjectToView;
+                     if (parent == null) return;
+                     string path = parent.Path;
+                     bool isDirectory;
+                     try
+                     {
+                         isDirectory = Service.IsDirectory(path);
+                     }
+                     catch
+                     {
+                         return;
+                     }
 
                      if(isDirectory)
                      {
-                         List<string> folders = Service.GetFolders(path);
-                         folders = Service.GetNamesFromPaths(folders);
-                         foreach(string folder in folders)
+                         List<string> foldersAndFiles = Service.GetFoldersAndFilesFromPath(path);
+                         foldersAndFiles = Service.GetNamesFromPaths(foldersAndFiles);
+                         foreach (string @object in foldersAndFiles)
                          {
-                             TreeViewItem newItem = new TreeViewItem()
+                             ObjectToView item = new ObjectToView()
                              {
-                                 Header = folder,
-                                 Tag = parent.Tag + "\\" + folder
+                                 Name = @object,
+                                 Path = path + "\\" + @object,
+                                 Image = Service.GetImageByPath(path + "\\" + @object)
                              };
-                             parent.Items.Add(newItem);
-                         }
-
-                         List<string> files = Service.GetFiles(path);
-                         files = Service.GetNamesFromPaths(files);
-                         foreach (string file in files)
-                         {
-                             TreeViewItem newItem = new TreeViewItem()
-                             {
-                                 Header = file,
-                                 Tag = parent.Tag + "\\" + file
-                             };
-                             parent.Items.Add(newItem);
+                             parent.Childs.Add(item);
                          }
                      }
                      else
                      {
-                         Icon icon = Service.GetIconByPath(path);
-                         Image = Service.ToImageSource(icon);
+                         try
+                         {
+                             Process.Start(parent.Path); // в разных случаях тут могут быть исключения
+                         }
+                         catch { }
+                     }
+                 }));
+
+        RelayCommand selectedItemChanged;
+        public RelayCommand SelectedItemChanged => selectedItemChanged ??
+                 (selectedItemChanged = new RelayCommand(obj =>
+                 {
+                     ObjectToView parent = obj as ObjectToView;
+                     if (parent == null) return;
+                     string path = parent.Path;
+                     bool isDirectory;
+                     try
+                     {
+                         isDirectory = Service.IsDirectory(path);
+                     }
+                     catch
+                     {
+                         return;
+                     }
+
+                     if (isDirectory)
+                     {
+                         DirectoryInfo dirInfo = new DirectoryInfo(path);
+                         ContentModel = new ShortDirectoryInfo(dirInfo);                        
+                     }
+                     else
+                     {
+                         ContentModel = Service.GetFileInfoModel(path);
                      }
                  }));
 
         #endregion
+
+        void AddContextAction(ObjectToView @object)
+        {
+            try
+            {
+                if (Service.IsDirectory(@object.Path)) // тут может быть исключение если запрашиваем недоступную папку
+                {
+                    ContextAction showChild = new ContextAction
+                    {
+                        Header = "Развернуть дочерние элементы",
+                        Path = @object.Path
+                    };
+                    @object.Menu.Add(showChild);
+
+                    ContextAction showFolder = new ContextAction
+                    {
+                        Header = "Открыть",
+                        Path = @object.Path
+                    };
+                    @object.Menu.Add(showFolder);
+                }
+                else
+                {
+                    ContextAction start = new ContextAction
+                    {
+                        Header = "Открыть",
+                        Path = @object.Path
+                    };
+                    @object.Menu.Add(start);
+                }
+            }
+            catch { }
+        }
     }
 }

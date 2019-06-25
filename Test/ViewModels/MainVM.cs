@@ -1,8 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Drawing;
-using System.Windows.Controls;
-using System.Windows.Media;
 using Test.Models;
 
 namespace Test.ViewModels
@@ -30,39 +27,31 @@ namespace Test.ViewModels
             }
         }
 
-        public ObservableCollection<TreeViewItem> TreeItems
+        public BaseModel ContentModel
         {
-            get => mainModel.TreeItems;
+            get => mainModel.ContentModel;
             set
             {
-                mainModel.TreeItems = value;
+                mainModel.ContentModel = value;
                 OnPropertyChanged();
             }
         }
 
-        public ObservableCollection<ObjectToView> Objects
+
+
+        public ObservableCollection<ObjectToView> FoldersAndFiles
         {
-            get => mainModel.TreeItems;
+            get => mainModel.FoldersAndFiles;
             set
             {
-                mainModel.TreeItems = value;
+                mainModel.FoldersAndFiles = value;
                 OnPropertyChanged();
             }
         }
 
-        public RelayCommand SelectedItemChanged
-        {
-            get => mainModel.SelectedItemChanged;           
-        }
+        public RelayCommand ItemDoubleClick => mainModel.ItemDoubleClick;   
 
-        public ImageSource Image
-        {
-            get => mainModel.Image;
-            set
-            {
-                mainModel.Image = value;
-                OnPropertyChanged();
-            }
-        }
+        public RelayCommand SelectedItemChanged => mainModel.SelectedItemChanged;
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.ObjectModel;
 using System.Windows.Media;
 
 namespace Test.Models
@@ -22,7 +22,7 @@ namespace Test.Models
             get => path;
             set
             {
-                path = ValueTuple;
+                path = value;
                 OnPropertyChanged();
             }
         }
@@ -37,5 +37,18 @@ namespace Test.Models
                 OnPropertyChanged();
             }
         }
+
+        ObservableCollection<ObjectToView> childs = new ObservableCollection<ObjectToView>();
+        public ObservableCollection<ObjectToView> Childs
+        {
+            get => childs;
+            set
+            {
+                childs = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ObservableCollection<ContextAction> Menu { get; set; } = new ObservableCollection<ContextAction>();
     }
 }

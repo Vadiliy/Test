@@ -7,14 +7,38 @@ using System.Windows.Media;
 using System.Windows.Interop;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using Test.Models;
 
 namespace Test
 {
     public static class Service
     {
-        public static void GetObjectsFromDriver()
+        public static BaseModel GetFileInfoModel(string path)
         {
+            List<string> imageFormats = new List<string>()
+            {
+                "jpg", "jpeg", "png", "bmp"
+            };
 
+
+            FileInfo fileInfo = new FileInfo(path);
+            ShortFileInfo model = new ShortFileInfo(fileInfo);
+            bool IsImage = imageFormats.Contains(model.Format.ToLower());
+            if(IsImage)
+            {
+                ImageFileInfo imageModel = new ImageFileInfo(fileInfo);
+                return imageModel;
+            }
+            return model;
+        }
+
+        public static List<string> GetFoldersAndFilesFromPath(string path)
+        {
+            List<string> folders = GetFolders(path);
+            List<string> files = GetFiles(path);
+            List<string> objects = folders.Concat(files).ToList();
+
+            return objects;
         }
 
         public static bool IsDirectory(string path)
@@ -36,9 +60,8 @@ namespace Test
             {
                 folders = Directory.GetDirectories(path).ToList();
             }
-            catch (Exception e)
-            {
-                folders.Add(e.Message);
+            catch
+            {  
             }
             return folders;
         }
@@ -50,9 +73,8 @@ namespace Test
             {
                 files = Directory.GetFiles(path).ToList();
             }
-            catch (Exception e)
+            catch 
             {
-                files.Add(e.Message);
             }
             return files;
         }
@@ -70,12 +92,20 @@ namespace Test
             return newPaths;
         }
 
-        public static Icon GetIconByPath(string path)
+        public static ImageSource GetImageByPath(string path)
         {
-            return Icon.ExtractAssociatedIcon(path);
+            try
+            {
+                Icon icon = Icon.ExtractAssociatedIcon(path);
+                return ToImageSource(icon);
+            }
+            catch
+            {
+                return null;
+            }
         }
 
-        public static ImageSource ToImageSource(Icon icon)
+        static ImageSource ToImageSource(Icon icon)
         {
             Bitmap bitmap = icon.ToBitmap();
             IntPtr hBitmap = bitmap.GetHbitmap();
