@@ -50,5 +50,16 @@ namespace Test.Models
         }
 
         public ObservableCollection<ContextAction> Menu { get; set; } = new ObservableCollection<ContextAction>();
+
+        bool isExpanded;
+        public bool IsExpanded
+        {
+            get => isExpanded;
+            set
+            {
+                isExpanded = true;
+                OnPropertyChanged();
+            }
+        }
     }
 }

@@ -5,20 +5,19 @@
 
     <Style x:Key="TreeViewItemStyle" TargetType="{x:Type TreeViewItem}">
         <Setter Property="Foreground" Value="White"/>
+        <Setter Property="IsExpanded" Value="{Binding Path=IsExpanded, UpdateSourceTrigger=PropertyChanged}"/>
         <Style.Resources>
             <!-- Set Highlight Background color -->
             <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#808080" />
 
         </Style.Resources>
-
         <Style.Triggers>
             <Trigger Property="IsSelected" Value="True">
                 <!-- Set Foreground color -->
                 <Setter Property="Foreground" Value="White" />
             </Trigger>
         </Style.Triggers>
-        
-    
+
     </Style>
     <Style x:Key="LabelStyle" TargetType="{x:Type Label}">
         <Setter Property="FontSize" Value="18"/>

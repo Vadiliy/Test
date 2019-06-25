@@ -150,6 +150,51 @@ namespace Test.Models
                      }
                  }));
 
+        RelayCommand startFile;
+        public RelayCommand StartFile => startFile ??
+                 (startFile = new RelayCommand(obj =>
+                 {
+                     string pathToFile = obj as string;
+                     try
+                     {
+                         Process.Start(pathToFile);
+                     }
+                     catch { }
+                 }));
+
+        RelayCommand showFolder;
+        public RelayCommand ShowFolder => showFolder ??
+                 (showFolder = new RelayCommand(obj =>
+                 {
+                     string pathToFolder = obj as string;
+                     try
+                     {
+                         Process.Start("explorer.exe", pathToFolder);
+                     }
+                     catch { }
+                 }));
+
+        RelayCommand showChilds;
+        public RelayCommand ShowChilds => showChilds ??
+                 (showChilds = new RelayCommand(obj =>
+                 {
+                     string pathToFolder = obj as string;
+                     ObjectToView parent = FoldersAndFiles.First(x => x.Path == pathToFolder);                    
+                     List<string> foldersAndFiles = Service.GetFoldersAndFilesFromPath(pathToFolder);
+                     foldersAndFiles = Service.GetNamesFromPaths(foldersAndFiles);
+                     foreach (string @object in foldersAndFiles)
+                     {
+                         ObjectToView item = new ObjectToView()
+                         {
+                             Name = @object,
+                             Path = pathToFolder + "\\" + @object,
+                             Image = Service.GetImageByPath(pathToFolder + "\\" + @object)
+                         };
+                         AddContextAction(item);
+                         parent.Childs.Add(item);
+                     }
+                     parent.IsExpanded = true;
+                 }));
         #endregion
 
         void AddContextAction(ObjectToView @object)
@@ -161,6 +206,7 @@ namespace Test.Models
                     ContextAction showChild = new ContextAction
                     {
                         Header = "Развернуть дочерние элементы",
+                        Action = ShowChilds,
                         Path = @object.Path
                     };
                     @object.Menu.Add(showChild);
@@ -168,6 +214,7 @@ namespace Test.Models
                     ContextAction showFolder = new ContextAction
                     {
                         Header = "Открыть",
+                        Action = ShowFolder,
                         Path = @object.Path
                     };
                     @object.Menu.Add(showFolder);
@@ -177,12 +224,13 @@ namespace Test.Models
                     ContextAction start = new ContextAction
                     {
                         Header = "Открыть",
+                        Action = StartFile,                       
                         Path = @object.Path
                     };
                     @object.Menu.Add(start);
                 }
             }
             catch { }
-        }
+        }        
     }
 }

@@ -67,7 +67,8 @@
                                     <ContextMenu.ItemTemplate>
                                         <DataTemplate>
                                             <MenuItem Header="{Binding Path=Header}" 
-                                                      Command="{Binding Path=Action}"/>
+                                                      Command="{Binding Path=Action}"
+                                                      CommandParameter="{Binding Path=Path}"/>
                                         </DataTemplate>
                                     </ContextMenu.ItemTemplate>
                                 </ContextMenu>
@@ -76,7 +77,6 @@
                     </HierarchicalDataTemplate>
                 </TreeView.ItemTemplate>
             </TreeView>
-            
 
             <Grid Grid.Column="1">
                 <ContentControl Content="{Binding ContentModel}" >
@@ -207,9 +207,6 @@
                     </ContentControl.Resources>
                 </ContentControl>
             </Grid>
-
-            
-            
         </Grid>
     </Grid>
 </Window>
