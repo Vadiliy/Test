@@ -39,6 +39,7 @@ namespace Test.Models
                     };
                     AddContextAction(item);
                     FoldersAndFiles.Add(item);
+                    PrivateFoldersAndFiles.Add(item);
                 }
             }
         }
@@ -66,6 +67,9 @@ namespace Test.Models
                 OnPropertyChanged();
             }
         }
+
+        ObservableCollection<ObjectToView> PrivateFoldersAndFiles { get; set; } = new ObservableCollection<ObjectToView>();
+
 
         List<string> logicalDrivers = new List<string>();
         public List<string> LogicalDrivers
@@ -103,10 +107,8 @@ namespace Test.Models
                      if(isDirectory)              
                          ShowChilds.Execute(path);
                      
-                     else
-                     {
-                         ProcessStart(path);                     
-                     }
+                     else                    
+                         ProcessStart(path);                                          
                  }));
 
         RelayCommand selectedItemChanged;
@@ -162,7 +164,8 @@ namespace Test.Models
                  (showChilds = new RelayCommand(obj =>
                  {
                      string pathToFolder = obj as string;
-                     ObjectToView parent = FoldersAndFiles.First(x => x.Path == pathToFolder);
+                     ObjectToView parent = PrivateFoldersAndFiles.First(x => x.Path == pathToFolder);
+
                      if(parent.Childs.Count > 0)
                      {
                          parent.IsExpanded = true;
@@ -180,6 +183,7 @@ namespace Test.Models
                          };
                          AddContextAction(item);
                          parent.Childs.Add(item);
+                         PrivateFoldersAndFiles.Add(item);
                      }
                      parent.IsExpanded = true;
                  }));
