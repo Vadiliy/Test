@@ -86,6 +86,8 @@ namespace Test.Models
                  {
                      ObjectToView parent = obj as ObjectToView;
                      if (parent == null) return;
+                     if (parent.Childs.Count > 0)  return;
+                     
                      string path = parent.Path;
                      bool isDirectory;
                      try
@@ -97,28 +99,12 @@ namespace Test.Models
                          return;
                      }
 
-                     if(isDirectory)
-                     {
-                         List<string> foldersAndFiles = Service.GetFoldersAndFilesFromPath(path);
-                         foldersAndFiles = Service.GetNamesFromPaths(foldersAndFiles);
-                         foreach (string @object in foldersAndFiles)
-                         {
-                             ObjectToView item = new ObjectToView()
-                             {
-                                 Name = @object,
-                                 Path = path + "\\" + @object,
-                                 Image = Service.GetImageByPath(path + "\\" + @object)
-                             };
-                             parent.Childs.Add(item);
-                         }
-                     }
+                     if(isDirectory)              
+                         ShowChilds.Execute(path);
+                     
                      else
                      {
-                         try
-                         {
-                             Process.Start(parent.Path); // в разных случаях тут могут быть исключения
-                         }
-                         catch { }
+                         ProcessStart(path); // в разных случаях тут могут быть исключения                       
                      }
                  }));
 
@@ -155,11 +141,7 @@ namespace Test.Models
                  (startFile = new RelayCommand(obj =>
                  {
                      string pathToFile = obj as string;
-                     try
-                     {
-                         Process.Start(pathToFile);
-                     }
-                     catch { }
+                     ProcessStart(pathToFile);
                  }));
 
         RelayCommand showFolder;
@@ -179,7 +161,12 @@ namespace Test.Models
                  (showChilds = new RelayCommand(obj =>
                  {
                      string pathToFolder = obj as string;
-                     ObjectToView parent = FoldersAndFiles.First(x => x.Path == pathToFolder);                    
+                     ObjectToView parent = FoldersAndFiles.First(x => x.Path == pathToFolder);
+                     if(parent.Childs.Count > 0)
+                     {
+                         parent.IsExpanded = true;
+                         return;
+                     }
                      List<string> foldersAndFiles = Service.GetFoldersAndFilesFromPath(pathToFolder);
                      foldersAndFiles = Service.GetNamesFromPaths(foldersAndFiles);
                      foreach (string @object in foldersAndFiles)
@@ -196,6 +183,16 @@ namespace Test.Models
                      parent.IsExpanded = true;
                  }));
         #endregion
+
+        #region Methods
+        void ProcessStart(string pathToFile)
+        {
+            try
+            {
+                Process.Start(pathToFile);
+            }
+            catch { }
+        }
 
         void AddContextAction(ObjectToView @object)
         {
@@ -231,6 +228,7 @@ namespace Test.Models
                 }
             }
             catch { }
-        }        
+        }
+        #endregion
     }
 }

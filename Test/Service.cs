@@ -76,6 +76,10 @@ namespace Test
             catch 
             {
             }
+            finally
+            {
+                files.Sort();
+            }
             return files;
         }
 

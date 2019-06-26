@@ -57,7 +57,7 @@ namespace Test.Models
             get => isExpanded;
             set
             {
-                isExpanded = true;
+                isExpanded = value;
                 OnPropertyChanged();
             }
         }
