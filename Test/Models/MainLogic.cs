@@ -105,7 +105,7 @@ namespace Test.Models
                      
                      else
                      {
-                         ProcessStart(path); // в разных случаях тут могут быть исключения                       
+                         ProcessStart(path);                     
                      }
                  }));
 
