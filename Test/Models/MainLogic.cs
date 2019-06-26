@@ -12,6 +12,7 @@ namespace Test.Models
         public MainLogic()
         {
             LogicalDrivers = Environment.GetLogicalDrives().ToList();
+            SelectedDriver = LogicalDrivers[0];
         }     
     
         string selectedDriver;
