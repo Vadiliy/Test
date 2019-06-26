@@ -182,13 +182,6 @@ namespace Test.Models
                      }
                      parent.IsExpanded = true;
                  }));
-
-        RelayCommand disableHightLight;
-        public RelayCommand DisableHightLight => disableHightLight ??
-                 (disableHightLight = new RelayCommand(obj =>
-                 {
-                    
-                 }));
         #endregion
 
         #region Methods

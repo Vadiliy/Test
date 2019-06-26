@@ -52,8 +52,6 @@ namespace Test.ViewModels
         public RelayCommand ItemDoubleClick => mainModel.ItemDoubleClick;   
 
         public RelayCommand SelectedItemChanged => mainModel.SelectedItemChanged;
-
-        
     }
 }
 
