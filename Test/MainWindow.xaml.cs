@@ -24,5 +24,11 @@ namespace Test
         {
             InitializeComponent();
         }
+
+        private void RightClick(object sender, MouseButtonEventArgs e)
+        {
+            
+            e.Handled = true;
+        }
     }
 }

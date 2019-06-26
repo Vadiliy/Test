@@ -70,6 +70,7 @@
     <Compile Include="Models\ShortFileInfo.cs" />
     <Compile Include="RelayCommand.cs" />
     <Compile Include="Service.cs" />
+    <Compile Include="SetterAction.cs" />
     <Compile Include="ViewModels\MainVM.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

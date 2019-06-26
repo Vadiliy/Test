@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
         xmlns:local="clr-namespace:Test"
         xmlns:vm="clr-namespace:Test.ViewModels"
         mc:Ignorable="d"
@@ -38,7 +39,7 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
-            <TreeView Background="Transparent" Name="myTreeView"
+            <TreeView Background="Transparent" Name="myTreeView" TreeViewItem.PreviewMouseRightButtonDown="RightClick"    
                       ItemsSource="{Binding Path=FoldersAndFiles, UpdateSourceTrigger=PropertyChanged}"
                       ItemContainerStyle="{DynamicResource TreeViewItemStyle}" >
                 <i:Interaction.Triggers>
@@ -50,11 +51,15 @@
                         <i:InvokeCommandAction Command="{Binding Path=SelectedItemChanged}"
                                    CommandParameter="{Binding ElementName=myTreeView, Path=SelectedItem}"/>
                     </i:EventTrigger>
+                    <i:EventTrigger EventName="PreviewMouseLeftButtonDown Event">
+                        <local:SetterAction PropertyName="Background" Value="Transpend" />
+                    </i:EventTrigger>
                 </i:Interaction.Triggers>
                 <TreeView.Resources>
                     <Style TargetType="TreeViewItem">
                         <Setter Property="Foreground" Value="White"/>
                     </Style>
+                    
                 </TreeView.Resources>
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate ItemsSource="{Binding Path=Childs}" 
@@ -66,7 +71,9 @@
                                 <Image Height="16" Width="16" Source="{Binding Path=Image}"/>
                                 <TextBlock FontSize="16" Text="{Binding Path=Name}" />
                                 <StackPanel.ContextMenu>
-                                    <ContextMenu Style="{DynamicResource ContextMenuStyle}" ItemsSource="{Binding Path=Menu}">
+                                    <ContextMenu Style="{DynamicResource ContextMenuStyle}" 
+                                                 ItemsSource="{Binding Path=Menu}"
+                                                 ItemContainerStyle="{DynamicResource ItemMenuStyle}">
                                         <ContextMenu.ItemTemplate>
                                             <DataTemplate>
                                                 <MenuItem Header="{Binding Path=Header}" 
@@ -80,6 +87,7 @@
                         </Border>
                     </HierarchicalDataTemplate>
                 </TreeView.ItemTemplate>
+                
             </TreeView>
 
             <Grid Grid.Column="1">

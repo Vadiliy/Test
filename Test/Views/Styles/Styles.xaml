@@ -46,9 +46,12 @@
             </Setter.Value>
         </Setter>
     </Style>
+    <SolidColorBrush x:Key="ButtonBrush" Color="Yellow" />
+
 
     <Style x:Key="TreeViewItemStyle" TargetType="{x:Type TreeViewItem}">
         <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Background" Value="Transparent"/>
         <Setter Property="IsExpanded" Value="{Binding Path=IsExpanded, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
         <Style.Resources>
             <!-- Set Highlight Background color -->
@@ -60,8 +63,16 @@
                 <!-- Set Foreground color -->
                 <Setter Property="Margin" Value="20,0,0,0"/>
             </Trigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsSelected" Value="true" />
+                    <Condition Property="Selector.IsSelectionActive" Value="true" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Foreground" Value="Yellow" />
+            </MultiTrigger>
+            
         </Style.Triggers>
-
+        
     </Style>
     <Style x:Key="LabelStyle" TargetType="{x:Type Label}">
         <Setter Property="FontSize" Value="18"/>
@@ -78,20 +89,13 @@
     </Style>
 
     <!--ContextMenu-->
-    <Color x:Key="BorderMediumColor">#FF888888</Color>
+    <Color x:Key="BorderMediumColor">#88888888</Color>
     <LinearGradientBrush x:Key="MenuPopupBrush"
                      EndPoint="0.5,1"
                      StartPoint="0.5,0">
-        <GradientStop Color="{DynamicResource ControlLightColor}"
-                Offset="0" />
-        <GradientStop Color="{DynamicResource ControlMediumColor}"
-                Offset="0.5" />
-        <GradientStop Color="{DynamicResource ControlLightColor}"
-                Offset="1" />
     </LinearGradientBrush>
 
     <Style x:Key="ContextMenuStyle" TargetType="{x:Type ContextMenu}">
-        
         <Setter Property="SnapsToDevicePixels"
           Value="True" />
         <Setter Property="OverridesDefaultStyle"
@@ -100,12 +104,13 @@
           Value="true" />
         <Setter Property="HasDropShadow"
           Value="True" />
+
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ContextMenu}">
                     <Border x:Name="Border"
                 Background="{StaticResource MenuPopupBrush}"
-                BorderThickness="1">
+                BorderThickness="2">
                         <Border.BorderBrush>
                             <SolidColorBrush Color="{StaticResource BorderMediumColor}" />
                         </Border.BorderBrush>
@@ -120,14 +125,31 @@
                     Value="0,3,0,3" />
                             <Setter TargetName="Border"
                     Property="CornerRadius"
-                    Value="4" />
+                    Value="8" />
                         </Trigger>
                     </ControlTemplate.Triggers>
+
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
 
+    <Style x:Key="ItemMenuStyle" TargetType="{x:Type MenuItem}">
+        <Setter Property="Foreground" Value="White"/>
+        <!--<Style.Triggers>
+            <EventTrigger RoutedEvent="MouseEnter">
+                <BeginStoryboard>
+                    <Storyboard>
+                        <ColorAnimation To="{StaticResource BorderMediumColor}" 
+                                    Storyboard.TargetProperty="(MenuItem.Background).(SolidColorBrush.Color)" 
+                                    FillBehavior="Stop" 
+                                    Duration="0:0:0"/>
+                    </Storyboard>
+                </BeginStoryboard>
+            </EventTrigger>
+        </Style.Triggers>-->
+
+    </Style>
     <!--ComboBox-->
     
     <LinearGradientBrush x:Key="BackgroundBrushPopUp" EndPoint="0,1" StartPoint="0,0">
